@@ -1,0 +1,14 @@
+{
+  "name": "smallcase-common-stocks",
+  "version": "1.0.0",
+  "description": "Script to find common stocks between one or more smallcases",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aman Singh",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^8.0.0"
+  }
+}
