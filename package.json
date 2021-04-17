@@ -9,6 +9,7 @@
   "author": "Aman Singh",
   "license": "ISC",
   "dependencies": {
-    "puppeteer": "^8.0.0"
+    "puppeteer": "^8.0.0",
+    "xlsx": "^0.16.9"
   }
 }

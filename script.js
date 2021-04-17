@@ -3,13 +3,14 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
+const xlsx = require("xlsx");
 
 const { user: userid, password, pin } = JSON.parse(
     fs.readFileSync("/home/aman/Documents/.private/secret.json")
 );
 const smallcases = [
-    "https://smallcase.zerodha.com/smallcase/SCMO_0026",
-    "https://smallcase.zerodha.com/smallcase/SCMO_0003",
+    "https://smallcase.zerodha.com/smallcase/SCMO_0014",
+    "https://smallcase.zerodha.com/smallcase/SCSB_0004",
 ];
 
 const base_url = "https://smallcase.zerodha.com";
@@ -22,20 +23,21 @@ const base_url = "https://smallcase.zerodha.com";
             defaultViewport: null,
         });
 
-        const pages = await browserInstance.pages();
+        let pages = await browserInstance.pages();
         const tab1 = pages[0];
         await login(tab1);
         const sc1Pr = getStocks(smallcases[0], browserInstance);
         const sc2Pr = getStocks(smallcases[1], browserInstance);
         const [sc1, sc2] = await Promise.all([sc1Pr, sc2Pr]);
         const commonStocks = getCommon(sc1, sc2);
-        await tab1.bringToFront();
-        if (commonStocks.length >= 2) {
-            const answer = await tab1.evaluate((commonStocks) => {
-                const answer = prompt(`Found ${commonStocks.length} common stocks!
-                
+        pages = await browserInstance.pages();
+        const currentTab = pages[pages.length - 1];
+        if (commonStocks.stocks.length >= 2) {
+            const answer = await currentTab.evaluate((commonStocks) => {
+                const answer = prompt(`Found ${commonStocks.stocks.length} common stocks!
+
 Choose an operation (1-5):
-    1. Create new smallcase of common stocks found in the given smallcases.
+    1. Create new smallcase of common stocks.
     2. Create Excel file of stocks.
     3. Create JSON file of stocks.
     4. Print stocks on console.
@@ -45,7 +47,7 @@ Choose an operation (1-5):
             }, commonStocks);
 
             if (answer == 1) {
-                await createSmallcase(commonStocks, browserInstance);
+                await createSmallcase(commonStocks.stocks, browserInstance);
             } else if (answer == 2) {
                 createExcel(commonStocks);
             } else if (answer == 3) {
@@ -56,16 +58,16 @@ Choose an operation (1-5):
                 createExcel(commonStocks);
                 createJSON(commonStocks);
                 console.table(commonStocks);
-                await createSmallcase(commonStocks, browserInstance);
+                await createSmallcase(commonStocks.stocks, browserInstance);
             } else {
                 console.log("INVALID INPUT");
             }
-        } else if (commonStocks.length > 0) {
-            await tab1.evaluate((commonStocks) => {
-                const answer = prompt(`Found ${commonStocks.length} common stocks!
-                
+        } else if (commonStocks.stocks.length > 0) {
+            const answer = await currentTab.evaluate((commonStocks) => {
+                const answer = prompt(`Found ${commonStocks.stocks.length} common stocks!
+
 For creating a new smallcase 2 or more stocks required.
-                
+
 Choose from available options below (1-4):
     1. Create Excel file of stocks.
     2. Create JSON file of stocks.
@@ -89,15 +91,10 @@ Choose from available options below (1-4):
                 console.log("INVALID INPUT");
             }
         } else {
-            await tab1.evaluate(() => {
+            await currentTab.evaluate(() => {
                 alert(`Found 0 common stocks! Try with different smallcases.`);
             });
         }
-        // if (commonStocks.length > 1) {
-        //     await createSmallcase(commonStocks, browserInstance);
-        // } else {
-        //     console.log(commonStocks);
-        // }
     } catch (err) {
         console.log(err);
     }
@@ -132,12 +129,22 @@ async function getStocks(url, browserInstance) {
     return newTab.evaluate((selector) => {
         const stockElements = document.querySelectorAll(selector);
         let stocks = [...stockElements].map((stock) => stock.innerText.trim());
-        return stocks;
+        const smallcaseName = document
+            .querySelector("h1.SmallcaseProfileBanner__name__2ln5a")
+            .innerText.trim();
+        return {
+            name: smallcaseName,
+            stocks: stocks,
+        };
     }, stockSelector);
 }
 
 function getCommon(s1, s2) {
-    return s1.filter((stock) => s2.includes(stock));
+    const stocks = s1.stocks.filter((stock) => s2.stocks.includes(stock));
+    return {
+        smallcases: [s1.name, s2.name],
+        stocks: stocks,
+    };
 }
 
 async function createSmallcase(commonStocks, browserInstance) {
@@ -177,12 +184,29 @@ async function createSmallcase(commonStocks, browserInstance) {
 }
 
 function createExcel(commonStocks) {
-    //TODO
+    const content = excelify(commonStocks);
+    const newWb = xlsx.utils.book_new();
+    const newWs = xlsx.utils.json_to_sheet(content);
+    xlsx.utils.book_append_sheet(newWb, newWs, "Sheet1");
+    xlsx.writeFile(newWb, path.join(__dirname, "stocks.xlsx"));
+}
+
+function excelify(commonStocks) {
+    const result = [];
+    for (let key of Object.keys(commonStocks)) {
+        let temp = commonStocks[key].map((stock) => {
+            return { [key]: stock };
+        });
+        result.push(...temp);
+    }
+
+    return result;
 }
 
 function createJSON(commonStocks) {
     const filePath = path.join(__dirname, "stocks.json");
-    fs.writeFileSync(filePath, JSON.stringify({ stocks: commonStocks }));
+    fs.writeFileSync(filePath, JSON.stringify(commonStocks));
+    return filePath;
 }
 
 async function waitAndType(selector, text, tab, delay = 100) {
