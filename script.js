@@ -5,9 +5,12 @@ const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
 
+// getting zerodha username and password
 const { user: userid, password, pin } = JSON.parse(
     fs.readFileSync("/home/aman/Documents/.private/secret.json")
 );
+
+//change this array to compare different smallcases
 const smallcases = [
     "https://smallcase.zerodha.com/smallcase/SCMO_0014",
     "https://smallcase.zerodha.com/smallcase/SCSB_0004",
@@ -15,6 +18,7 @@ const smallcases = [
 
 const base_url = "https://smallcase.zerodha.com";
 
+//main function
 (async () => {
     try {
         const browserInstance = await puppeteer.launch({
@@ -100,6 +104,7 @@ Choose from available options below (1-4):
     }
 })();
 
+//login function
 async function login(tab) {
     await tab.goto(base_url);
     await waitAndClick("button.LoginButton__small__cr6GJ", tab);
@@ -110,6 +115,7 @@ async function login(tab) {
     return waitAndClick("button[type='submit']", tab);
 }
 
+//function to get stocks of a smallcase
 async function getStocks(url, browserInstance) {
     const newTab = await browserInstance.newPage();
     await newTab.goto(url);
@@ -139,6 +145,7 @@ async function getStocks(url, browserInstance) {
     }, stockSelector);
 }
 
+//function to get common stocks between two smallcase
 function getCommon(s1, s2) {
     const stocks = s1.stocks.filter((stock) => s2.stocks.includes(stock));
     return {
@@ -147,11 +154,12 @@ function getCommon(s1, s2) {
     };
 }
 
-async function createSmallcase(commonStocks, browserInstance) {
+//function to create a custom smallcase
+async function createSmallcase(stocks, browserInstance) {
     const newTab = await browserInstance.newPage();
     await newTab.goto(base_url);
     await waitAndClick("a:last-child", newTab);
-    for (const stock of commonStocks) {
+    for (const stock of stocks) {
         await waitAndType(".input-focus", stock, newTab, 100);
         await newTab.waitForTimeout(2000);
         await waitAndClick("#react-autowhatever-1--item-0", newTab);
@@ -183,18 +191,20 @@ async function createSmallcase(commonStocks, browserInstance) {
     );
 }
 
-function createExcel(commonStocks) {
-    const content = excelify(commonStocks);
+//function to create excel file of stocks
+function createExcel(stocks) {
+    const content = excelify(stocks);
     const newWb = xlsx.utils.book_new();
     const newWs = xlsx.utils.json_to_sheet(content);
     xlsx.utils.book_append_sheet(newWb, newWs, "Sheet1");
     xlsx.writeFile(newWb, path.join(__dirname, "stocks.xlsx"));
 }
 
-function excelify(commonStocks) {
+//function to convert stocks object to xlsx supported array of objects
+function excelify(stocks) {
     const result = [];
-    for (let key of Object.keys(commonStocks)) {
-        let temp = commonStocks[key].map((stock) => {
+    for (let key of Object.keys(stocks)) {
+        let temp = stocks[key].map((stock) => {
             return { [key]: stock };
         });
         result.push(...temp);
@@ -203,17 +213,20 @@ function excelify(commonStocks) {
     return result;
 }
 
-function createJSON(commonStocks) {
+//function to create json file of stocks
+function createJSON(stocks) {
     const filePath = path.join(__dirname, "stocks.json");
-    fs.writeFileSync(filePath, JSON.stringify(commonStocks));
+    fs.writeFileSync(filePath, JSON.stringify(stocks));
     return filePath;
 }
 
+//function to wait for selector and then type
 async function waitAndType(selector, text, tab, delay = 100) {
     await tab.waitForSelector(selector);
     return tab.type(selector, text, { delay: delay });
 }
 
+//function to wait for selector and then click
 async function waitAndClick(selector, tab) {
     await tab.waitForSelector(selector);
     return tab.click(selector);
