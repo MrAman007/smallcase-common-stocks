@@ -29,12 +29,75 @@ const base_url = "https://smallcase.zerodha.com";
         const sc2Pr = getStocks(smallcases[1], browserInstance);
         const [sc1, sc2] = await Promise.all([sc1Pr, sc2Pr]);
         const commonStocks = getCommon(sc1, sc2);
-        if (commonStocks.length > 1) {
-            await createSmallcase(commonStocks, browserInstance);
-            console.log("DONE");
+        await tab1.bringToFront();
+        if (commonStocks.length >= 2) {
+            const answer = await tab1.evaluate((commonStocks) => {
+                const answer = prompt(`Found ${commonStocks.length} common stocks!
+                
+Choose an operation (1-5):
+    1. Create new smallcase of common stocks found in the given smallcases.
+    2. Create Excel file of stocks.
+    3. Create JSON file of stocks.
+    4. Print stocks on console.
+    5. All of the above.`);
+
+                return answer;
+            }, commonStocks);
+
+            if (answer == 1) {
+                await createSmallcase(commonStocks, browserInstance);
+            } else if (answer == 2) {
+                createExcel(commonStocks);
+            } else if (answer == 3) {
+                createJSON(commonStocks);
+            } else if (answer == 4) {
+                console.table(commonStocks);
+            } else if (answer == 5) {
+                createExcel(commonStocks);
+                createJSON(commonStocks);
+                console.table(commonStocks);
+                await createSmallcase(commonStocks, browserInstance);
+            } else {
+                console.log("INVALID INPUT");
+            }
+        } else if (commonStocks.length > 0) {
+            await tab1.evaluate((commonStocks) => {
+                const answer = prompt(`Found ${commonStocks.length} common stocks!
+                
+For creating a new smallcase 2 or more stocks required.
+                
+Choose from available options below (1-4):
+    1. Create Excel file of stocks.
+    2. Create JSON file of stocks.
+    3. Print stocks on console.
+    4. All of the above.`);
+
+                return answer;
+            }, commonStocks);
+
+            if (answer == 1) {
+                createExcel(commonStocks);
+            } else if (answer == 2) {
+                createJSON(commonStocks);
+            } else if (answer == 3) {
+                console.table(commonStocks);
+            } else if (answer == 4) {
+                createExcel(commonStocks);
+                createJSON(commonStocks);
+                console.table(commonStocks);
+            } else {
+                console.log("INVALID INPUT");
+            }
         } else {
-            console.log(commonStocks);
+            await tab1.evaluate(() => {
+                alert(`Found 0 common stocks! Try with different smallcases.`);
+            });
         }
+        // if (commonStocks.length > 1) {
+        //     await createSmallcase(commonStocks, browserInstance);
+        // } else {
+        //     console.log(commonStocks);
+        // }
     } catch (err) {
         console.log(err);
     }
@@ -113,6 +176,15 @@ async function createSmallcase(commonStocks, browserInstance) {
     );
 }
 
+function createExcel(commonStocks) {
+    //TODO
+}
+
+function createJSON(commonStocks) {
+    const filePath = path.join(__dirname, "stocks.json");
+    fs.writeFileSync(filePath, JSON.stringify({ stocks: commonStocks }));
+}
+
 async function waitAndType(selector, text, tab, delay = 100) {
     await tab.waitForSelector(selector);
     return tab.type(selector, text, { delay: delay });
@@ -122,13 +194,3 @@ async function waitAndClick(selector, tab) {
     await tab.waitForSelector(selector);
     return tab.click(selector);
 }
-
-// div.RouteTab__tab_border__2LY1- .RouteTab__tab__25-kK a
-// div.StocksWeights__column-left__3oEdJ .StocksWeights__stock-name__2ANv4 (stock name)
-// a:nth-child(3)
-// .input-focus
-// react-autowhatever-1--item-0
-// .btn.btn-lg.btn-fw.btn-secondary-blue.mt16.mb32
-// .SmallcaseMeta__input-smallcase-name__2XSQD.form-control.full.input.text-14
-// .SmallcaseMeta__input-smallcase-description__ZFbzN.form-control.full.input.text-14
-// button[type='submit']
