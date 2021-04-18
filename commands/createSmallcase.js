@@ -1,4 +1,5 @@
 "use strict";
+const { waitAndClick, waitAndType } = require("../utils/utils");
 
 async function createSmallcase(stocks, browserInstance) {
     const newTab = await browserInstance.newPage();

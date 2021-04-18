@@ -21,12 +21,12 @@ function createJSON(stocks, dirPath) {
 }
 
 //function to create excel file of stocks
-function createExcelCommon(stocks) {
+function createExcelCommon(stocks, dirPath) {
     const content = excelifyCommon(stocks);
     const newWb = xlsx.utils.book_new();
     const newWs = xlsx.utils.json_to_sheet(content);
     xlsx.utils.book_append_sheet(newWb, newWs, "Sheet1");
-    xlsx.writeFile(newWb, path.join(__dirname, "stocks.xlsx"));
+    xlsx.writeFile(newWb, path.join(path.resolve(dirPath), "stocks.xlsx"));
 }
 
 //function to convert stocks object to xlsx supported array of objects
