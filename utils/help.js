@@ -17,7 +17,7 @@ Description:
 
 Example Usage:
     -> node scTool.js -get input.json       (gets smallcase stocks in JSON) [default behaviour works the same without -get option]
-    -> node scTool.js -compare input.json   (gets common stocks between smallcases)   
+    -> node scTool.js -common input.json   (gets common stocks between smallcases)   
     `);
 }
 
