@@ -19,6 +19,11 @@ scTool is made using:
 -   [xlsx](https://www.npmjs.com/package/xlsx) - for creating excel files
 -   rest features are implemented using **nodejs** and its APIs.
 
+## Requirements
+
+-   Nodejs
+-   Zeordha Account
+
 ## Usage
 
 scTool is fairly simple to use
