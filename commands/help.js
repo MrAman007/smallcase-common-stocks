@@ -10,7 +10,13 @@ Compare two smallcases and gets common stocks.
 Description:
     This script takes smallcase URL as input through JSON file, compares them to get common stocks
     and then gives you option to store the stock in JSON format, Excel OR create a custom smallcase
-    of common stocks.`);
+    of common stocks.
+
+    Check inputJsonTemplate for valid JSON format.
+
+Example Usage:
+    -> node script.js input.json  
+    `);
 }
 
 module.exports = {

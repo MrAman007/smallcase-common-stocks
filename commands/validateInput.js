@@ -10,7 +10,7 @@ const options = {
 
 function validateInput(input, smallcases, inputOption) {
     if (input.length === 0) {
-        console.log("NO INPUT GIVEN!!");
+        console.log("No INPUT given!\nTry node script.js -h for more info.");
         return false;
     }
     for (const i of input) {
@@ -29,6 +29,7 @@ function validateInput(input, smallcases, inputOption) {
                 // else push JSON data
                 const temp = getJsonData(i);
                 if (temp === false) {
+                    console.log("Invalid Input!");
                     return false;
                 } else {
                     if (
@@ -50,7 +51,6 @@ function validateInput(input, smallcases, inputOption) {
 function getJsonData(filePath) {
     filePath = path.resolve(filePath);
     if (!fs.existsSync(filePath)) {
-        console.log("JSON File NOT FOUND!!");
         return false;
     } else {
         return JSON.parse(fs.readFileSync(filePath));
