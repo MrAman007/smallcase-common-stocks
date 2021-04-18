@@ -5,24 +5,38 @@ const path = require("path");
 
 // list of valid options
 const options = {
-    "-h": "help",
+    "-help": "get manual",
+    "-get": "extract stocks of smallcase",
+    "-common": "get common stocks between smallcases",
 };
 
 function validateInput(input, smallcases, inputOption) {
     if (input.length === 0) {
-        console.log("No INPUT given!\nTry node script.js -h for more info.");
+        console.log("No INPUT given!\nTry node scTool.js -help for more info.");
         return false;
     }
+    let flag = false; // flag to control that inputOption gets only one option -get or -common
     for (const i of input) {
         // if passed argument is a valid option then push it to inputOption list
         if (options.hasOwnProperty(i)) {
-            inputOption.push(i);
-            return true;
+            if (!flag && (i === "-get" || i === "-common")) {
+                //handling edge case
+                flag = true;
+                inputOption.push(i);
+            }
+            if (flag && (i === "-get" || i === "-common")) {
+                continue;
+            } else {
+                if (!inputOption.includes(i)) {
+                    //checking duplicate option and pushing
+                    inputOption.push(i);
+                }
+            }
         } else {
             // if passed argument is invalid option then print error and return failure
             if (i.charAt(0) === "-") {
                 console.log(
-                    `invalid option -- ${i}\nTry 'node script.js -h' for more information.`
+                    `invalid option -- ${i}\nTry 'node scTool.js -help' for more information.`
                 );
                 return false; //invalid input
             } else {
