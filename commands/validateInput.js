@@ -3,21 +3,46 @@
 const fs = require("fs");
 const path = require("path");
 
-function validateInput(input, smallcases) {
+// list of valid options
+const options = {
+    "-h": "help",
+};
+
+function validateInput(input, smallcases, inputOption) {
     if (input.length === 0) {
         console.log("NO INPUT GIVEN!!");
         return false;
     }
-    const temp = getJsonData(input[0]);
-    if (temp === false) {
-        return false;
-    } else {
-        if (temp.hasOwnProperty("smallcase") && temp.smallcase.length > 1) {
-            smallcases.push(...temp.smallcase);
+    for (const i of input) {
+        // if passed argument is a valid option then push it to inputOption list
+        if (options.hasOwnProperty(i)) {
+            inputOption.push(i);
             return true;
         } else {
-            console.log("Invalid JSON");
-            return false;
+            // if passed argument is invalid option then print error and return failure
+            if (i.charAt(0) === "-") {
+                console.log(
+                    `invalid option -- ${i}\nTry 'node script.js -h' for more information.`
+                );
+                return false; //invalid input
+            } else {
+                // else push JSON data
+                const temp = getJsonData(i);
+                if (temp === false) {
+                    return false;
+                } else {
+                    if (
+                        temp.hasOwnProperty("smallcase") &&
+                        temp.smallcase.length > 1
+                    ) {
+                        smallcases.push(...temp.smallcase);
+                        return true;
+                    } else {
+                        console.log("Invalid JSON");
+                        return false;
+                    }
+                }
+            }
         }
     }
 }

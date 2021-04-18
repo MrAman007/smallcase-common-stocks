@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
 const { validateInput } = require("./commands/validateInput");
+const { help } = require("./commands/help");
 
 // getting zerodha username and password
 const { user: userid, password, pin } = JSON.parse(
@@ -16,10 +17,16 @@ const base_url = "https://smallcase.zerodha.com";
 const input = process.argv.slice(2);
 
 const smallcases = [];
+const inputOption = [];
 
-const isValid = validateInput(input, smallcases);
+const isValid = validateInput(input, smallcases, inputOption);
 
 if (!isValid) {
+    return;
+}
+
+if (inputOption.includes("-h")) {
+    help();
     return;
 }
 
