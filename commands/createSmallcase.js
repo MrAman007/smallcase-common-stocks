@@ -1,4 +1,6 @@
 "use strict";
+
+const base_url = require("../utils/baseUrl");
 const { waitAndClick, waitAndType } = require("../utils/utils");
 
 async function createSmallcase(stocks, browserInstance) {

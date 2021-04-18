@@ -2,6 +2,7 @@
 
 const puppeteer = require("puppeteer");
 const fs = require("fs");
+const path = require("path");
 const { validateInput } = require("./utils/validateInput");
 const { help } = require("./utils/help");
 const {
@@ -9,6 +10,7 @@ const {
     waitAndType,
     createJSON,
     createExcelCommon,
+    createExcel,
 } = require("./utils/utils");
 const { getStocks } = require("./commands/getStocks");
 const { getCommon } = require("./commands/getCommon");
@@ -19,8 +21,7 @@ const { user: userid, password, pin } = JSON.parse(
     fs.readFileSync("/home/aman/Documents/.private/secret.json")
 );
 
-// homepage url
-const base_url = "https://smallcase.zerodha.com";
+const base_url = require("./utils/baseUrl");
 
 //cli input
 const input = process.argv.slice(2);
@@ -73,14 +74,15 @@ Choose an operation (1-5):
             }, stockArr);
 
             if (choice == 1) {
-                createJSON(stockArr, __dirname);
+                createJSON(stockArr, path.join(__dirname, "data"));
             } else if (choice == 2) {
-                createExcel(stockArr, __dirname);
+                createExcel(stockArr, path.join(__dirname, "data"));
             } else if (choice == 3) {
                 console.table(stockArr);
             } else if (choice == 4) {
-                createJSON(stockArr, __dirname);
-                createExcel(stockArr, __dirname);
+                createJSON(stockArr, path.join(__dirname, "data"));
+                createExcel(stockArr, path.join(__dirname, "data"));
+                console.table(stockArr);
             } else {
                 console.log("INVALID INPUT");
             }
@@ -116,14 +118,29 @@ Choose an operation (1-5):
                             browserInstance
                         );
                     } else if (answer == 2) {
-                        createExcelCommon(commonStocksObj, __dirname);
+                        createExcelCommon(
+                            commonStocksObj,
+                            path.join(__dirname, "data")
+                        );
                     } else if (answer == 3) {
-                        createJSON(commonStocksObj, __dirname);
+                        createJSON(
+                            commonStocksObj,
+                            path.join(__dirname, "data")
+                        );
                     } else if (answer == 4) {
-                        console.table(commonStocksObj, __dirname);
+                        console.table(
+                            commonStocksObj,
+                            path.join(__dirname, "data")
+                        );
                     } else if (answer == 5) {
-                        createExcelCommon(commonStocksObj, __dirname);
-                        createJSON(commonStocksObj, __dirname);
+                        createExcelCommon(
+                            commonStocksObj,
+                            path.join(__dirname, "data")
+                        );
+                        createJSON(
+                            commonStocksObj,
+                            path.join(__dirname, "data")
+                        );
                         console.table(commonStocksObj);
                         await createSmallcase(
                             commonStocksObj.stocks,
@@ -153,12 +170,12 @@ Choose from available options below (1-4):
                     if (answer == 1) {
                         createExcelCommon(commonStocks);
                     } else if (answer == 2) {
-                        createJSON(commonStocks, __dirname);
+                        createJSON(commonStocks, path.join(__dirname, "data"));
                     } else if (answer == 3) {
                         console.table(commonStocks);
                     } else if (answer == 4) {
                         createExcelCommon(commonStocks);
-                        createJSON(commonStocks, __dirname);
+                        createJSON(commonStocks, path.join(__dirname, "data"));
                         console.table(commonStocks);
                     } else {
                         console.log("INVALID INPUT");

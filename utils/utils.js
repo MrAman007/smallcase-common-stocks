@@ -43,10 +43,30 @@ function excelifyCommon(stocks) {
 }
 
 //TODO create excel for stocks array
+function createExcel(stocks, dirPath) {
+    const content = excelifyStocksArr(stocks);
+    const newWb = xlsx.utils.book_new();
+    const newWs = xlsx.utils.json_to_sheet(content);
+    xlsx.utils.book_append_sheet(newWb, newWs, "Sheet1");
+    xlsx.writeFile(newWb, path.join(path.resolve(dirPath), "stocks.xlsx"));
+}
+function excelifyStocksArr(stocks) {
+    const result = [];
+    for (const obj of stocks) {
+        const key = obj.name;
+        const temp = obj.stocks.map((stock) => {
+            return { [key]: stock };
+        });
+        result.push(...temp);
+    }
+
+    return result;
+}
 
 module.exports = {
     waitAndClick,
     waitAndType,
     createJSON,
     createExcelCommon,
+    createExcel,
 };
