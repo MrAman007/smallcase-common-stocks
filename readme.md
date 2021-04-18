@@ -3,7 +3,7 @@
 ## _Tool for the smart investor_
 
 smallcase-tool OR scTool is a web scrapping/automation tool for smallcase website.
-Smallcase is a basket of stocks picked by experienced professionals, but you can find even better stocks to invest in by using this tool.
+Smallcase is a basket of stocks picked by experienced professionals, using this tool you can filter quality stocks from different smallcases and create your own smallcase.
 
 ## Features
 
