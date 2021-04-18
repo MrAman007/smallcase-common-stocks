@@ -4,19 +4,24 @@ const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
+const { validateInput } = require("./commands/validateInput");
 
 // getting zerodha username and password
 const { user: userid, password, pin } = JSON.parse(
     fs.readFileSync("/home/aman/Documents/.private/secret.json")
 );
-
-//change this array to compare different smallcases
-const smallcases = [
-    "https://smallcase.zerodha.com/smallcase/SCMO_0014",
-    "https://smallcase.zerodha.com/smallcase/SCSB_0004",
-];
-
 const base_url = "https://smallcase.zerodha.com";
+
+//cli input
+const input = process.argv.slice(2);
+
+const smallcases = [];
+
+const isValid = validateInput(input, smallcases);
+
+if (!isValid) {
+    return;
+}
 
 //main function
 (async () => {
