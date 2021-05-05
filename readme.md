@@ -28,7 +28,14 @@ scTool is made using:
 
 scTool is fairly simple to use and is very interactive.
 
+1. Clone or Download the repository.
+2. Run the command like this.
+
 ```sh
-//Run tool using
+/*Run tool using*/
+
 node index.js
 ```
+
+3. Inteface will look like this
+   ![Interface]('./../interface.pnginterface.png');
