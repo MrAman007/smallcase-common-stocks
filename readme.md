@@ -1,5 +1,7 @@
 # Smallcase Tool
 
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+
 ## _Tool for the smart investor_
 
 smallcase-tool is a web scrapping/automation tool for smallcase website.
@@ -53,3 +55,9 @@ scTool is made using:
 -   Nodejs
 -   Zeordha Account
 
+
+## License
+
+MIT
+
+**Free Software, Hell Yeah!**
