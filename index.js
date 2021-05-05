@@ -49,6 +49,8 @@ const getSmallcase = async function () {
     return smallcase;
 };
 
+
+
 //login function
 async function login(tab, username, password, pin) {
     await tab.goto(base_url);
@@ -88,7 +90,19 @@ async function login(tab, username, password, pin) {
             console.log(stocksArr);
         } else if (input.operation == "get common stocks") {
             for (let i = 0; i < 2; i++) {
-                smallcases.push(await getSmallcase());
+                const sc = await getSmallcase();
+                smallcases.push(sc.trim());
+            }
+            const commonStocks = await getCommon(
+                smallcases[0],
+                smallcases[1],
+                browserInstance
+            );
+            console.log(commonStocks);
+        } else if (input.operation == "create smallcase of common stocks") {
+            for (let i = 0; i < 2; i++) {
+                const sc = await getSmallcase();
+                smallcases.push(sc.trim());
             }
 
             const commonStocks = await getCommon(
@@ -96,7 +110,8 @@ async function login(tab, username, password, pin) {
                 smallcases[1],
                 browserInstance
             );
-            console.log(commonStocks);
+
+            createSmallcase(commonStocks, browserInstance);
         }
     } catch (err) {
         console.log(err);
