@@ -38,4 +38,4 @@ node index.js
 ```
 
 3. Inteface will look like this
-   ![Interface]('./../interface.pnginterface.png');
+![interface](https://user-images.githubusercontent.com/40262320/117166037-a60d4100-ade3-11eb-9adc-e8e17c3dbe55.png)
