@@ -23,7 +23,6 @@ const { getCommon } = require("./lib/getCommon");
 const { createSmallcase } = require("./lib/createSmallcase");
 
 const base_url = require("./lib/baseUrl");
-const input = require("./lib/input");
 
 //Script Launch Display
 clear();
@@ -48,8 +47,6 @@ const getSmallcase = async function () {
     const { smallcase } = await askForSmallcase();
     return smallcase;
 };
-
-
 
 //login function
 async function login(tab, username, password, pin) {
@@ -88,6 +85,8 @@ async function login(tab, username, password, pin) {
             }
             const stocksArr = await Promise.all(stockArrPromise);
             console.log(stocksArr);
+            createJSON(stocksArr, "./");
+            createExcel(stocksArr, "./");
         } else if (input.operation == "get common stocks") {
             for (let i = 0; i < 2; i++) {
                 const sc = await getSmallcase();
@@ -99,6 +98,8 @@ async function login(tab, username, password, pin) {
                 browserInstance
             );
             console.log(commonStocks);
+            createJSON(commonStocks, "./");
+            createExcelCommon(commonStocks, "./");
         } else if (input.operation == "create smallcase of common stocks") {
             for (let i = 0; i < 2; i++) {
                 const sc = await getSmallcase();
